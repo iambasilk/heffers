@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Testing\Fluent\Concerns\Has;
 
 class UserController extends Controller
 {
@@ -23,7 +27,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        //
+        return view('registration');
     }
 
     /**
@@ -34,7 +38,25 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:6',
+        ]);
+           
+        $data = $request->all();
+        $check = $this->createData($data);
+         
+        return redirect("dashboard")->withSuccess('Registration complete');
+    }
+
+    public function createData(array $data)
+    {
+      return User::create([
+        'name' => $data['name'],
+        'email' => $data['email'],
+        'password' => Hash::make($data['password'])
+      ]);
     }
 
     /**
@@ -81,4 +103,10 @@ class UserController extends Controller
     {
         //
     }
+
+    public function dashboard()
+    {
+        return view('dashboard');
+    }
+
 }
